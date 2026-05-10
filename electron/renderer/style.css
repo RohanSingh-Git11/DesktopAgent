@@ -1,0 +1,354 @@
+:root {
+    --bg-dark: #050505;
+    --accent: #00f2ff;
+    --accent-dim: rgba(0, 242, 255, 0.2);
+    --text-main: #ffffff;
+    --text-dim: #888;
+    --glass: rgba(10, 10, 10, 0.85);
+    --border: rgba(255, 255, 255, 0.08);
+    --font: 'Space Grotesk', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-user-select: none;
+}
+
+body {
+    background: transparent;
+    color: var(--text-main);
+    font-family: var(--font);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.glass-container {
+    background: var(--glass);
+    backdrop-filter: blur(30px);
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 100px rgba(0,0,0,0.8);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    -webkit-app-region: drag;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.window-controls button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1.3rem;
+    margin-left: 15px;
+    -webkit-app-region: no-drag;
+}
+
+.hero-section h1 {
+    font-size: 2.8rem;
+    font-weight: 300;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
+}
+
+.hero-section h1 span {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.hero-section p {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-bottom: 35px;
+    text-transform: uppercase;
+}
+
+.input-area {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+#task-input {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    padding: 18px;
+    color: white;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+#task-input:focus {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.06);
+}
+
+#run-btn {
+    background: var(--accent);
+    color: black;
+    border: none;
+    padding: 0 40px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#run-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px var(--accent-dim);
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+    gap: 25px;
+    flex: 1;
+    min-height: 250px;
+}
+
+.panel {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.panel-badge {
+    font-size: 0.55rem;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 1px;
+}
+
+h3 {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.scroll-area {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Hide scrollbar */
+.scroll-area::-webkit-scrollbar {
+    width: 0px;
+}
+
+.step-item {
+    padding: 12px;
+    border-left: 2px solid var(--border);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.step-item.running {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    padding-left: 20px;
+}
+
+.step-item.done {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.05);
+    color: #00ff88;
+}
+
+.stat-item {
+    margin-bottom: 25px;
+}
+
+.stat-item label {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.progress-bg {
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 15px var(--accent);
+    transition: width 0.8s ease-in-out;
+}
+
+#active-app-val, #session-state, #bg-brain-status {
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.log-panel {
+    margin-top: 25px;
+    height: 150px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+}
+
+#logs {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.log-entry {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.observation {
+    white-space: pre-wrap;
+    background: rgba(0, 242, 255, 0.03);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#settings-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 20px;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+#settings-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.hotkey-tip {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+}
+
+/* Settings Modal */
+.settings-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.92);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-content {
+    width: 350px;
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.setting-group label {
+    display: block;
+    font-size: 0.65rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+    letter-spacing: 1px;
+}
+
+.setting-group input, .setting-group select {
+    width: 100%;
+    background: #111;
+    border: 1px solid var(--border);
+    padding: 12px;
+    color: white;
+    font-family: var(--font);
+    outline: none;
+}
+
+#save-settings {
+    background: var(--accent);
+    border: none;
+    padding: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+}

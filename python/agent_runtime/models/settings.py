@@ -1,8 +1,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 class AgentSettings(BaseModel):
+    api_key: Optional[str] = None
     model: str = "gemini-2.0-flash"
     temperature: float = 0.0
     max_tokens: int = 4096
