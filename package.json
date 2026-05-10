@@ -1,0 +1,50 @@
+{
+  "name": "desktop-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Windows hotkey desktop AI command center with Gemini key routing.",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build:backend": "node electron/build-backend.js",
+    "pack": "npm run build:backend && electron-builder --dir",
+    "dist": "npm run build:backend && electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.rohansingh.thinkingsurface",
+    "productName": "Desktop Command Center",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/backend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^26.0.12"
+  }
+}
