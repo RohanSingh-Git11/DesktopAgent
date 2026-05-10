@@ -44,7 +44,7 @@ class DesktopBackend:
         self._scheduler = ProactiveScheduler(self._run_background_task)
 
     async def _run_background_task(self, goal: str):
-        _emit("system_info", {"message": f"Background Task: {goal}"})
+        _emit("system_info", {"message": f"Background Task Triggered: {goal}"})
         if self._agent_runtime:
             await self._agent_runtime.run(goal, _emit, f"bg-{int(time.time())}")
 
@@ -58,7 +58,6 @@ class DesktopBackend:
 
         _emit("backend_state", {"state": "ready"})
 
-        # Start Scheduler
         asyncio.create_task(self._scheduler.start())
 
         while self._running:
@@ -96,6 +95,12 @@ class DesktopBackend:
                 self._active_task = asyncio.create_task(
                     self._agent_runtime.run(prompt, _emit, request_id)
                 )
+            return
+
+        if cmd_type == "get_skills":
+            if self._agent_runtime:
+                skills = self._agent_runtime.workshop.get_all_skills()
+                _emit("skills_list", {"skills": [s.model_dump() for s in skills]})
             return
 
         if cmd_type == "add_schedule":

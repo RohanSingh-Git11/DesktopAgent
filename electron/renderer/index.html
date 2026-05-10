@@ -38,10 +38,20 @@
                 <div class="panel planner-panel">
                     <div class="panel-header">
                         <h3>ROADMAP</h3>
-                        <span class="panel-badge">SKILLS APPLIED</span>
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="plan">PLAN</button>
+                            <button class="tab-btn" data-tab="skills" id="skills-tab-btn">SKILLS</button>
+                        </div>
                     </div>
-                    <div id="steps-list" class="scroll-area">
-                        <div class="empty-state">No active plan</div>
+                    <div id="plan-view" class="tab-view active">
+                        <div id="steps-list" class="scroll-area">
+                            <div class="empty-state">No active plan</div>
+                        </div>
+                    </div>
+                    <div id="skills-view" class="tab-view">
+                        <div id="skills-list" class="scroll-area">
+                            <div class="empty-state">No skills learned yet</div>
+                        </div>
                     </div>
                 </div>
 
@@ -91,6 +101,10 @@
                         <option value="minimized">Minimized</option>
                         <option value="compact">Compact</option>
                     </select>
+                </div>
+                <div class="setting-group">
+                    <label>PROACTIVE JOBS</label>
+                    <button id="add-job-btn" style="background: none; border: 1px solid var(--accent); color: var(--accent); width: 100%; padding: 5px; font-size: 0.7rem; cursor: pointer;">Add Background Task</button>
                 </div>
                 <button id="save-settings">APPLY</button>
             </div>

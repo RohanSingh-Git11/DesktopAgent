@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const taskInput = document.getElementById('task-input');
 const runBtn = document.getElementById('run-btn');
 const stepsList = document.getElementById('steps-list');
+const skillsList = document.getElementById('skills-list');
 const logs = document.getElementById('logs');
 const confidenceBar = document.getElementById('confidence-bar');
 const confidenceVal = document.getElementById('confidence-val');
@@ -10,17 +11,20 @@ const activeAppVal = document.getElementById('active-app-val');
 const settingsBtn = document.getElementById('settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const saveSettingsBtn = document.getElementById('save-settings');
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabViews = document.querySelectorAll('.tab-view');
 
 // State
 let currentTaskSteps = [];
 
 // Listen for backend messages
 ipcRenderer.on('backend-msg', (event, msg) => {
-    addLog(`[${msg.type}]`);
+    // addLog(`[${msg.type}]`);
 
     switch(msg.type) {
         case 'agent_plan_generated':
             renderPlan(msg.steps);
+            switchToTab('plan');
             break;
         case 'agent_step_update':
             updateStep(msg.index, msg.status, msg.all_steps);
@@ -30,9 +34,11 @@ ipcRenderer.on('backend-msg', (event, msg) => {
             break;
         case 'agent_observation':
             if (msg.type === 'browser' || msg.type === 'desktop') {
-                addLog(`Ref Map Received (${msg.type})`);
                 renderObservation(msg.snapshot);
             }
+            break;
+        case 'skills_list':
+            renderSkills(msg.skills);
             break;
         case 'system_info':
             addLog(`SYS: ${msg.message}`);
@@ -40,6 +46,8 @@ ipcRenderer.on('backend-msg', (event, msg) => {
         case 'agent_task_finished':
             addLog('Task complete: ' + (msg.result.success ? 'SUCCESS' : 'FAILED'));
             document.getElementById('status-text').innerText = 'SYSTEM READY';
+            // Request fresh skills list
+            ipcRenderer.send('send-to-backend', { type: 'get_skills' });
             break;
         case 'error':
             addLog('ERROR: ' + msg.message);
@@ -67,16 +75,33 @@ function renderPlan(steps) {
     });
 }
 
+function renderSkills(skills) {
+    skillsList.innerHTML = '';
+    if (skills.length === 0) {
+        skillsList.innerHTML = '<div class="empty-state">No skills learned yet</div>';
+        return;
+    }
+    skills.forEach(skill => {
+        const div = document.createElement('div');
+        div.className = 'skill-item';
+        div.innerHTML = `
+            <h4>${skill.name}</h4>
+            <p>${skill.description}</p>
+            <div style="font-size: 0.6rem; color: #555; margin-top: 5px;">Uses: ${skill.success_count}</div>
+        `;
+        div.onclick = () => {
+            taskInput.value = skill.name;
+        };
+        skillsList.appendChild(div);
+    });
+}
+
 function renderObservation(snapshot) {
-    // Add to logs in a formatted way
     const entry = document.createElement('div');
     entry.className = 'log-entry observation';
-    entry.style.color = '#00f2ff';
-    entry.style.borderLeft = '1px solid #00f2ff';
-    entry.style.paddingLeft = '5px';
-    entry.style.marginTop = '5px';
     entry.innerText = `OBSERVATION REFS:\n${snapshot}`;
     logs.appendChild(entry);
+    logs.scrollTop = logs.scrollHeight;
 }
 
 function updateStep(index, status, all_steps) {
@@ -96,6 +121,24 @@ function updateState(state) {
         activeAppVal.innerText = state.active_app.toUpperCase();
     }
 }
+
+function switchToTab(tabId) {
+    tabBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+    tabViews.forEach(view => {
+        view.classList.toggle('active', view.id === `${tabId}-view`);
+    });
+}
+
+tabBtns.forEach(btn => {
+    btn.onclick = () => {
+        switchToTab(btn.dataset.tab);
+        if (btn.dataset.tab === 'skills') {
+            ipcRenderer.send('send-to-backend', { type: 'get_skills' });
+        }
+    };
+});
 
 runBtn.addEventListener('click', () => {
     const prompt = taskInput.value.trim();
@@ -131,6 +174,22 @@ saveSettingsBtn.addEventListener('click', () => {
     settingsModal.style.display = 'none';
 });
 
+document.getElementById('add-job-btn').onclick = () => {
+    const goal = prompt("Enter task for background scheduler:");
+    const interval = prompt("Enter interval in seconds:", "3600");
+    if (goal && interval) {
+        ipcRenderer.send('send-to-backend', {
+            type: 'add_schedule',
+            goal: goal,
+            interval: parseInt(interval)
+        });
+        addLog(`Added schedule: ${goal}`);
+    }
+};
+
 // Window controls
 document.getElementById('close-btn').addEventListener('click', () => ipcRenderer.send('close-app'));
 document.getElementById('minimize-btn').addEventListener('click', () => ipcRenderer.send('minimize-app'));
+
+// Initial skill fetch
+ipcRenderer.send('send-to-backend', { type: 'get_skills' });

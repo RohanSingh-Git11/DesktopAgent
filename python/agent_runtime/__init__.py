@@ -2,6 +2,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+import re
 from pathlib import Path
 from typing import Callable, Dict, Any, List, Optional
 
@@ -36,7 +37,7 @@ class AgentRuntime:
         self.state = StateCore(state_dir / "state")
         self.memory = GlobalMemory(state_dir / "memory")
         self.learning = LearningSystem(state_dir / "learning")
-        self.workshop = SkillWorkshop(state_dir / "state") # Shared DB
+        self.workshop = SkillWorkshop(state_dir / "state")
         self.vision = VisionSystem(state_dir / "vision")
         self.windows = WindowManager()
         self.browser = BrowserEngine()
@@ -57,13 +58,23 @@ class AgentRuntime:
         res = emit("agent_task_started", {"goal": goal})
         if asyncio.iscoroutine(res): await res
 
-        # 1. Full Task Decomposition (Requirement 2)
+        # 1. Full Task Decomposition
         try:
             steps = await self.planner.decompose_task(goal)
-            self.state.update(steps=steps)
-            res = emit("agent_plan_generated", {"steps": [s.model_dump() for s in steps]})
+            task_steps = []
+            for i, s in enumerate(steps):
+                if isinstance(s, str):
+                    task_steps.append(TaskStep(index=i, description=s))
+                elif isinstance(s, TaskStep):
+                    task_steps.append(s)
+                else:
+                    task_steps.append(TaskStep(index=i, description=str(s)))
+
+            self.state.update(steps=task_steps)
+            res = emit("agent_plan_generated", {"steps": [s.model_dump() for s in self.state.current.steps]})
             if asyncio.iscoroutine(res): await res
         except Exception as e:
+            log.error(f"Planning failed: {e}")
             res = emit("error", {"message": f"Planning failed: {e}"})
             if asyncio.iscoroutine(res): await res
             return
@@ -87,18 +98,30 @@ class AgentRuntime:
 
             while not success and retries <= max_retries:
                 try:
-                    # Deterministic Interaction Detection
+                    # Deterministic Environment Detection
                     desc = step.description.lower()
-                    if "browser" in desc or "http" in desc or "www" in desc:
-                         # Use AI-Native Browser Logic
-                         if not self.browser.browser: await self.browser.start(headless=True)
-                         if "open" in desc or "navigate" in desc:
-                              url = "https://" + desc.split("to")[-1].strip() if "to" in desc else "https://google.com"
+
+                    # A. Browser Context
+                    if any(x in desc for x in ["browser", "http", "www", "site", "web"]):
+                         if not self.browser.context: await self.browser.start(headless=False)
+                         if any(x in desc for x in ["open", "navigate", "go to"]):
+                              url_match = re.search(r'https?://[^\s]+', desc)
+                              url = url_match.group(0) if url_match else "https://google.com"
                               await self.browser.navigate(url)
 
                          snapshot = await self.browser.get_ai_snapshot()
                          res = emit("agent_observation", {"type": "browser", "snapshot": snapshot})
                          if asyncio.iscoroutine(res): await res
+
+                    # B. Desktop Context
+                    elif any(x in desc for x in ["window", "app", "desktop", "excel", "powerpoint", "word", "notepad"]):
+                         # Extract app name from description
+                         app_match = re.search(r'(excel|powerpoint|word|notepad|chrome|slack|discord)', desc)
+                         if app_match:
+                             self.windows.bind_to_window(app_match.group(0))
+                             snapshot = self.windows.get_desktop_snapshot()
+                             res = emit("agent_observation", {"type": "desktop", "snapshot": snapshot})
+                             if asyncio.iscoroutine(res): await res
 
                     # Native OS Execution
                     await self.executor.execute_step(step.description)
@@ -108,7 +131,7 @@ class AgentRuntime:
                         success = True
                         self.state.set_step_status(i, "done")
                     else:
-                        raise Exception("UI verification failed")
+                        raise Exception("UI verification failed - state did not reach expected target")
 
                 except Exception as e:
                     retries += 1
@@ -129,17 +152,20 @@ class AgentRuntime:
             })
             if asyncio.iscoroutine(res): await res
 
+            if self.state.current.steps[i].status == "failed":
+                break
+
         # 3. Final Output & Skill Recording
         result = self.finalizer.finalize_task()
         if result["success"]:
-            # Requirement 13: Self-Learning (Autonomous Skill Workshop)
+            # Record successful workflow as a Skill
             self.workshop.save_skill(Skill(
                 name=goal,
-                description=f"Automated workflow for: {goal}",
+                description=f"High-fidelity workflow for: {goal}",
                 steps=[s.description for s in self.state.current.steps],
                 app_context=self.state.current.active_app
             ))
 
         res = emit("agent_task_finished", {"result": result})
         if asyncio.iscoroutine(res): await res
-        if self.browser.browser: await self.browser.stop()
+        if self.browser.context: await self.browser.stop()

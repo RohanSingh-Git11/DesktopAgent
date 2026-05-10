@@ -169,6 +169,37 @@ header {
     margin-bottom: 20px;
 }
 
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.tab-btn.active {
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+}
+
+.tab-view {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+}
+
+.tab-view.active {
+    display: flex;
+}
+
 .panel-badge {
     font-size: 0.55rem;
     color: var(--accent);
@@ -190,12 +221,11 @@ h3 {
     overflow-y: auto;
 }
 
-/* Hide scrollbar */
 .scroll-area::-webkit-scrollbar {
     width: 0px;
 }
 
-.step-item {
+.step-item, .skill-item {
     padding: 12px;
     border-left: 2px solid var(--border);
     margin-bottom: 15px;
@@ -214,6 +244,17 @@ h3 {
     border-color: #00ff88;
     background: rgba(0, 255, 136, 0.05);
     color: #00ff88;
+}
+
+.skill-item h4 {
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 5px;
+}
+
+.skill-item p {
+    font-size: 0.65rem;
+    color: var(--text-dim);
 }
 
 .stat-item {
@@ -240,11 +281,6 @@ h3 {
     background: var(--accent);
     box-shadow: 0 0 15px var(--accent);
     transition: width 0.8s ease-in-out;
-}
-
-#active-app-val, #session-state, #bg-brain-status {
-    font-weight: 500;
-    font-size: 0.85rem;
 }
 
 .log-panel {
@@ -302,7 +338,6 @@ footer {
     letter-spacing: 1px;
 }
 
-/* Settings Modal */
 .settings-overlay {
     position: absolute;
     top: 0;
