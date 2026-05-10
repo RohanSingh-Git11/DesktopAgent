@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AERUK | AI Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <header>
+            <div class="logo">AERUK<span>.</span></div>
+            <div class="status-bar">
+                <span id="status-text">SYSTEM READY</span>
+                <div class="status-indicator"></div>
+            </div>
+            <div class="window-controls">
+                <button id="minimize-btn">_</button>
+                <button id="close-btn">×</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero-section">
+                <h1>COMMAND <span>SURFACE</span></h1>
+                <p>Advanced OS-Level Orchestration | V2 Engine</p>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="task-input" placeholder="Initiate task (e.g., 'Open Excel and create a budget table')">
+                <button id="run-btn">EXECUTE</button>
+            </div>
+
+            <div class="dashboard">
+                <div class="panel planner-panel">
+                    <div class="panel-header">
+                        <h3>ROADMAP</h3>
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="plan">PLAN</button>
+                            <button class="tab-btn" data-tab="skills" id="skills-tab-btn">SKILLS</button>
+                        </div>
+                    </div>
+                    <div id="plan-view" class="tab-view active">
+                        <div id="steps-list" class="scroll-area">
+                            <div class="empty-state">No active plan</div>
+                        </div>
+                    </div>
+                    <div id="skills-view" class="tab-view">
+                        <div id="skills-list" class="scroll-area">
+                            <div class="empty-state">No skills learned yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel stats-panel">
+                    <div class="stat-item">
+                        <label>CONFIDENCE</label>
+                        <div class="progress-bg">
+                            <div id="confidence-bar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span id="confidence-val">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>ACTIVE APP</label>
+                        <span id="active-app-val">NONE</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>RECOVERY ENGINE</label>
+                        <span id="session-state">STABLE</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>BACKGROUND BRAIN</label>
+                        <span id="bg-brain-status" style="color: var(--accent);">ACTIVE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="log-panel">
+                <div class="panel-header">
+                    <h3>SYSTEM LOGS</h3>
+                    <span class="panel-badge">REFS DETECTED</span>
+                </div>
+                <div id="logs" class="scroll-area"></div>
+            </div>
+        </main>
+
+        <div class="settings-overlay" id="settings-modal" style="display: none;">
+            <div class="settings-content">
+                <h2>CONFIG</h2>
+                <div class="setting-group">
+                    <label>GEMINI API KEY</label>
+                    <input type="password" id="api-key-input" placeholder="Enter key...">
+                </div>
+                <div class="setting-group">
+                    <label>UI DURING EXECUTION</label>
+                    <select id="ui-behavior">
+                        <option value="transparent">Transparent</option>
+                        <option value="minimized">Minimized</option>
+                        <option value="compact">Compact</option>
+                    </select>
+                </div>
+                <div class="setting-group toggle-group">
+                    <label>HUMAN MODE (STEALTH)</label>
+                    <input type="checkbox" id="human-mode-toggle">
+                </div>
+                <div class="setting-group">
+                    <label>PROACTIVE JOBS</label>
+                    <button id="add-job-btn" style="background: none; border: 1px solid var(--accent); color: var(--accent); width: 100%; padding: 5px; font-size: 0.7rem; cursor: pointer;">Add Background Task</button>
+                </div>
+                <button id="save-settings">APPLY</button>
+            </div>
+        </div>
+
+        <footer>
+            <button id="settings-btn">SETTINGS</button>
+            <div class="hotkey-tip">Win + J to toggle</div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
