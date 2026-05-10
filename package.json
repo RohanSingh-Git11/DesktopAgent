@@ -19,7 +19,9 @@
     },
     "files": [
       "electron/**/*",
-      "package.json"
+      "package.json",
+      "README.md",
+      "LICENSE"
     ],
     "extraResources": [
       {

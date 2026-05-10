@@ -43,6 +43,14 @@ Async is a high-performance, OS-level desktop AI agent built for seamless task o
    npm start
    ```
 
+### Packaging as .exe (Windows)
+
+To build a standalone portable executable:
+```bash
+npm run dist
+```
+The output will be in the `dist/` folder.
+
 2. **Configure:**
    - Use `Windows + J` to open the Async panel.
    - Click **SETTINGS** and enter your **Gemini API Key**.

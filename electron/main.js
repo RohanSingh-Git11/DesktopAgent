@@ -45,8 +45,17 @@ function createWindow() {
 }
 
 function startBackend() {
-  const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
-  backendProcess = spawn(pythonCmd, ['desktop_backend.py']);
+  let backendPath;
+  if (app.isPackaged) {
+    backendPath = path.join(process.resourcesPath, 'backend', 'async_backend', 'async_backend.exe');
+    if (process.platform !== 'win32') {
+       backendPath = path.join(process.resourcesPath, 'backend', 'async_backend', 'async_backend');
+    }
+    backendProcess = spawn(backendPath);
+  } else {
+    const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+    backendProcess = spawn(pythonCmd, ['desktop_backend.py']);
+  }
 
   backendProcess.stdout.on('data', (data) => {
     try {
