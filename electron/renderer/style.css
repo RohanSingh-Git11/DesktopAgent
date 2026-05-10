@@ -379,6 +379,16 @@ footer {
     outline: none;
 }
 
+.setting-group.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-group.toggle-group input[type="checkbox"] {
+    width: auto;
+}
+
 #save-settings {
     background: var(--accent);
     border: none;

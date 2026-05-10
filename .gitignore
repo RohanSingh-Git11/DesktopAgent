@@ -3,5 +3,10 @@ node_modules/
 .env
 .env.*
 *.log
+
+# Python
+__pycache__/
+*.pyc
+data/
 .claude/.simplify-ignore-cache/
 .claude/sdd-cache/

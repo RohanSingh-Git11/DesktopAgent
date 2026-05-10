@@ -1,4 +1,5 @@
-const { ipcRenderer } = require('electron');
+// Use the exposed API from preload.js
+const { electronAPI } = window;
 
 const taskInput = document.getElementById('task-input');
 const runBtn = document.getElementById('run-btn');
@@ -18,7 +19,7 @@ const tabViews = document.querySelectorAll('.tab-view');
 let currentTaskSteps = [];
 
 // Listen for backend messages
-ipcRenderer.on('backend-msg', (event, msg) => {
+electronAPI.on('backend-msg', (msg) => {
     // addLog(`[${msg.type}]`);
 
     switch(msg.type) {
@@ -47,7 +48,7 @@ ipcRenderer.on('backend-msg', (event, msg) => {
             addLog('Task complete: ' + (msg.result.success ? 'SUCCESS' : 'FAILED'));
             document.getElementById('status-text').innerText = 'SYSTEM READY';
             // Request fresh skills list
-            ipcRenderer.send('send-to-backend', { type: 'get_skills' });
+            electronAPI.send('send-to-backend', { type: 'get_skills' });
             break;
         case 'error':
             addLog('ERROR: ' + msg.message);
@@ -135,7 +136,7 @@ tabBtns.forEach(btn => {
     btn.onclick = () => {
         switchToTab(btn.dataset.tab);
         if (btn.dataset.tab === 'skills') {
-            ipcRenderer.send('send-to-backend', { type: 'get_skills' });
+            electronAPI.send('send-to-backend', { type: 'get_skills' });
         }
     };
 });
@@ -143,7 +144,7 @@ tabBtns.forEach(btn => {
 runBtn.addEventListener('click', () => {
     const prompt = taskInput.value.trim();
     if (prompt) {
-        ipcRenderer.send('send-to-backend', {
+        electronAPI.send('send-to-backend', {
             type: 'agent_task',
             prompt: prompt,
             request_id: 'task-' + Date.now()
@@ -154,7 +155,7 @@ runBtn.addEventListener('click', () => {
 
         const behavior = document.getElementById('ui-behavior').value;
         if (behavior === 'minimized') {
-            ipcRenderer.send('minimize-app');
+            electronAPI.send('minimize-app');
         }
     }
 });
@@ -165,12 +166,17 @@ settingsBtn.addEventListener('click', () => {
 
 saveSettingsBtn.addEventListener('click', () => {
     const apiKey = document.getElementById('api-key-input').value;
-    if (apiKey) {
-        ipcRenderer.send('send-to-backend', {
-            type: 'agent_settings',
-            settings: { api_key: apiKey }
-        });
-    }
+    const humanMode = document.getElementById('human-mode-toggle').checked;
+
+    const settings = {};
+    if (apiKey) settings.api_key = apiKey;
+    settings.human_mode = humanMode;
+
+    electronAPI.send('send-to-backend', {
+        type: 'agent_settings',
+        settings: settings
+    });
+
     settingsModal.style.display = 'none';
 });
 
@@ -178,7 +184,7 @@ document.getElementById('add-job-btn').onclick = () => {
     const goal = prompt("Enter task for background scheduler:");
     const interval = prompt("Enter interval in seconds:", "3600");
     if (goal && interval) {
-        ipcRenderer.send('send-to-backend', {
+        electronAPI.send('send-to-backend', {
             type: 'add_schedule',
             goal: goal,
             interval: parseInt(interval)
@@ -188,8 +194,8 @@ document.getElementById('add-job-btn').onclick = () => {
 };
 
 // Window controls
-document.getElementById('close-btn').addEventListener('click', () => ipcRenderer.send('close-app'));
-document.getElementById('minimize-btn').addEventListener('click', () => ipcRenderer.send('minimize-app'));
+document.getElementById('close-btn').addEventListener('click', () => electronAPI.send('close-app'));
+document.getElementById('minimize-btn').addEventListener('click', () => electronAPI.send('minimize-app'));
 
 // Initial skill fetch
-ipcRenderer.send('send-to-backend', { type: 'get_skills' });
+electronAPI.send('send-to-backend', { type: 'get_skills' });

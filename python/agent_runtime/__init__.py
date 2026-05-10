@@ -42,7 +42,7 @@ class AgentRuntime:
         self.windows = WindowManager()
         self.browser = BrowserEngine()
         self.planner = Planner(api_key=settings.api_key, skill_workshop=self.workshop)
-        self.executor = Executor(self.state, self.vision)
+        self.executor = Executor(self.state, self.vision, human_mode=settings.human_mode)
         self.verifier = Verifier(self.state, self.vision)
         self.recovery = RecoverySystem(self.state)
         self.finalizer = Finalizer(self.state, state_dir / "logs")
@@ -50,6 +50,7 @@ class AgentRuntime:
     def update_settings(self, settings: AgentSettings):
         self.settings = settings
         self.planner = Planner(api_key=settings.api_key, skill_workshop=self.workshop)
+        self.executor.update_settings(settings.human_mode)
 
     async def run(self, goal: str, emit: Callable[[str, Any], None], request_id: str):
         self.state.reset()
@@ -60,7 +61,9 @@ class AgentRuntime:
 
         # 1. Full Task Decomposition
         try:
-            steps = await self.planner.decompose_task(goal)
+            # Inject current window state into planner for better first step
+            current_apps = self.windows.get_running_apps()
+            steps = await self.planner.decompose_task(goal, context={"running_apps": current_apps})
             task_steps = []
             for i, s in enumerate(steps):
                 if isinstance(s, str):
@@ -124,7 +127,10 @@ class AgentRuntime:
                              if asyncio.iscoroutine(res): await res
 
                     # Native OS Execution
-                    await self.executor.execute_step(step.description)
+                    await self.executor.execute_step(step.description, context={
+                        "browser_engine": self.browser,
+                        "window_manager": self.windows
+                    })
 
                     # Strict Verification
                     if self.verifier.verify_step(step.description):

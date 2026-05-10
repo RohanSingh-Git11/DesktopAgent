@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 
 class AgentSettings(BaseModel):
     api_key: Optional[str] = None
+    human_mode: bool = False
     model: str = "gemini-2.0-flash"
     temperature: float = 0.0
     max_tokens: int = 4096
