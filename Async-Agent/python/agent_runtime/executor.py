@@ -89,15 +89,14 @@ class Executor:
 
     def _launch_app(self, app_name: str):
         import pyautogui
-        if sys.platform == 'win32' or 'linux' in sys.platform:
-            # On linux we might not have 'win' key but we'll try for the mock test
+        if sys.platform == 'win32':
             pyautogui.press('win')
             time.sleep(0.5)
             pyautogui.write(app_name, interval=0.1)
             time.sleep(0.5)
             pyautogui.press('enter')
         else:
-            log.info(f"Platform {sys.platform} - simulate launch of {app_name}")
+            log.info(f"Platform {sys.platform} - app launch simulation for {app_name}")
 
     def move_mouse_to(self, x: int, y: int):
         try:
