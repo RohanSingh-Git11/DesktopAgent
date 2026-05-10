@@ -1,8 +1,0 @@
-# chatgpt-scraper prompt file
-# Blank lines and lines starting with # are ignored
-
-What is the capital of Australia?
-Explain asyncio in Python in 2 sentences.
-What are the 3 laws of thermodynamics?
-What is the difference between TCP and UDP?
-Explain what a semaphore is in concurrent programming.
