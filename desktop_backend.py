@@ -26,7 +26,12 @@ log = get_logger(__name__)
 def _emit(event_type: str, payload: Any = None) -> None:
     data = {"type": event_type, "timestamp": str(time.time())}
     if isinstance(payload, dict):
-        data.update(payload)
+        # Prevent payload from overwriting essential keys like 'type'
+        for k, v in payload.items():
+            if k not in data:
+                data[k] = v
+            else:
+                data[f"payload_{k}"] = v
     elif payload is not None:
         data["payload"] = payload
 

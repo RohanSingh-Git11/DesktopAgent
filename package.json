@@ -1,8 +1,8 @@
 {
-  "name": "desktop-command-center",
+  "name": "async-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Windows hotkey desktop AI command center with Gemini key routing.",
+  "description": "Async - High-performance OS-level AI command center.",
   "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
@@ -12,8 +12,8 @@
     "dist": "npm run build:backend && electron-builder --win portable"
   },
   "build": {
-    "appId": "com.rohansingh.thinkingsurface",
-    "productName": "Desktop Command Center",
+    "appId": "com.rohansingh.async",
+    "productName": "Async",
     "directories": {
       "output": "dist"
     },
